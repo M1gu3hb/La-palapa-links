@@ -409,12 +409,75 @@
 
   // ---------------------------------------------------------------- entrada y loop
   const reveals = [...document.querySelectorAll('.rv')];
+  // Cada botón se forma primero con letras y símbolos (empieza por el contorno y se llena hacia dentro)
+  // y luego aparece el botón real debajo mientras los caracteres se disuelven.
+  const FORM_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#$%&*+=?@<>/|[]{}~^:;';
+  const page = document.querySelector('.page');
+  let charW = 0;
+  function forge(el, done) {
+    if (!charW) {
+      const g = document.createElement('canvas').getContext('2d');
+      g.font = '600 10px ui-monospace, Menlo, Consolas, monospace';
+      charW = g.measureText('M').width || 6;
+    }
+    const w = el.offsetWidth, h = el.offsetHeight, lh = 11;
+    if (!w || !h) { done(); return; }
+    let x = 0, y = 0;
+    for (let n = el; n && n !== page; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
+    const cols = Math.max(4, Math.floor(w / charW)), rows = Math.max(2, Math.floor(h / lh));
+    const f = document.createElement('span');
+    f.className = 'forge'; f.setAttribute('aria-hidden', 'true');
+    Object.assign(f.style, {
+      left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px',
+      borderRadius: getComputedStyle(el).borderRadius,
+      padding: ((h - rows * lh) / 2).toFixed(1) + 'px ' + ((w - cols * charW) / 2).toFixed(1) + 'px',
+    });
+    page.append(f);
+    const N = cols * rows, key = new Float32Array(N), out = new Float32Array(N), cell = new Array(N).fill('');
+    const half = Math.min(w, h) / 2;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const i = r * cols + c;
+      const d = Math.min(Math.min(c, cols - 1 - c) * charW, Math.min(r, rows - 1 - r) * lh) / half;
+      key[i] = Math.min(1, d) * .62 + Math.random() * .38;
+      out[i] = Math.random();
+    }
+    const FILL = 420, HOLD = 90, FADE = 420, t0 = performance.now();
+    let shown = false, flip = 0, drawn = 0;
+    const step = now => {
+      const t = now - t0;
+      if (t < FILL + HOLD + FADE) requestAnimationFrame(step); else { f.remove(); return; }
+      if (now - drawn < 32) return;                 // los caracteres se redibujan a ~30 cuadros por segundo
+      drawn = now;
+      const p = Math.min(1, t / FILL), q = Math.max(0, (t - FILL - HOLD) / FADE);
+      const reroll = now - flip > 45; if (reroll) flip = now;
+      let s = '';
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const i = r * cols + c;
+          if (key[i] < p * 1.06 && out[i] >= q) {
+            if (!cell[i] || (reroll && Math.random() < .3)) cell[i] = FORM_CHARS[(Math.random() * FORM_CHARS.length) | 0];
+            s += cell[i];
+          } else s += ' ';
+        }
+        if (r < rows - 1) s += String.fromCharCode(10);
+      }
+      f.textContent = s;
+      if (!shown && t >= FILL) { shown = true; done(); }
+      if (t >= FILL + HOLD && !f.classList.contains('out')) f.classList.add('out');
+    };
+    requestAnimationFrame(step);
+  }
+  const formed = new WeakSet();
   function revealAll(stagger) {
     reveals.forEach((el, i) => {
       const go = () => {
-        el.classList.add('in');
-        if (el.matches('.btn')) scramble(el.querySelector('.scr'), 560);
-        el.querySelectorAll('.soc, .pill').forEach(x => x.classList.add('in'));
+        if (formed.has(el)) return;
+        formed.add(el);
+        const show = () => {
+          el.classList.add('in');
+          if (el.matches('.btn')) scramble(el.querySelector('.scr'), 560);
+        };
+        if (el.matches('.btn, .soc, .pill')) forge(el, show); else show();
       };
       stagger ? setTimeout(go, i * 70) : go();
     });

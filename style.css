@@ -217,6 +217,13 @@ svg{display:block}
 .rv{opacity:0;transform:translateY(14px)}
 .rv.in{opacity:1;transform:none;transition:opacity .6s ease,transform .7s cubic-bezier(.2,.9,.25,1)}
 .static .rv{opacity:1;transform:none}
+.soc.in:active,.pill.in:active{transform:scale(.96)}
+
+/* Los botones se forman con letras y símbolos antes de aparecer */
+.forge{position:absolute;z-index:6;pointer-events:none;overflow:hidden;white-space:pre;
+  font:600 10px/11px ui-monospace,Menlo,Consolas,monospace;color:#efd391;text-shadow:0 0 6px rgba(239,211,145,.55);
+  transition:opacity .42s ease}
+.forge.out{opacity:0}
 
 /* Brillo ASCII dentro de los botones */
 .glyphs{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;

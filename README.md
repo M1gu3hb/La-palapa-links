@@ -8,7 +8,7 @@ En línea: https://la-palapa-links.vercel.app/
 
 - El logo se escribe solo con una pluma de oro (animación «Trazo de Oro»). Al tocarlo se vuelve a escribir. Los trazos salen de `assets/logo-palapa.svg` y el orden de escritura se calcula en el navegador.
 - Las tres fotos del jardín van de fondo, con zoom lento y un fundido suave entre una y otra.
-- Los botones tienen un reflejo que pasa, un barrido de caracteres y los íconos se dibujan solos.
+- Al aparecer, cada botón se forma primero con letras y símbolos y después aparece el botón. Tienen un reflejo que pasa, un barrido de caracteres y los íconos se dibujan solos.
 - Contacto en orden: Celular 55 5435 3649 (llamada y WhatsApp) y Teléfono de oficina 55 5653 7842 (llamada).
 - Botón de Compartir (menú nativo del teléfono).
 - Respeta la opción de reducir movimiento del sistema.
