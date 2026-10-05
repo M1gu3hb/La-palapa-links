@@ -1,8 +1,25 @@
 # Jardín La Palapa · Página de enlaces
 
-Página estática de contacto con fotografías del jardín, logo vectorial integrado, galería, transiciones con pausa y enlaces verificados. No requiere dependencias ni base de datos.
+Página de enlaces (*link in bio*) de Jardín La Palapa, jardín de eventos en Tepepan, Tlalpan, CDMX. Está pensada para QR, NFC y redes sociales: primero WhatsApp, después agenda, ubicación, llamada, servicios, opiniones, sitio web y redes.
 
-La entrada forma el logo, las fotos y los enlaces con una nube de caracteres ASCII en vino y dorado durante aproximadamente tres segundos y medio. Una cuadrícula más fina, un alfabeto de caracteres amplio y partículas que se reúnen y se disuelven reproducen los detalles de las fotografías y la marca. La fotografía admite hasta 24,000 partículas; el muestreo y sus colores se calculan una sola vez y el renderizado se limita a 30 cuadros por segundo. La animación decorativa no altera los nombres accesibles ni bloquea las acciones: se termina inmediatamente al tocar, desplazarse, usar el teclado o cambiar el tamaño de la ventana. Respeta la preferencia de movimiento reducido y se detiene al ocultar la pestaña.
+En línea: https://la-palapa-links.vercel.app/
+
+## Qué tiene
+
+- El logo se escribe solo con una pluma de oro (animación «Trazo de Oro»). Al tocarlo se vuelve a escribir. Los trazos salen de `assets/logo-palapa.svg` y el orden de escritura se calcula en el navegador.
+- Las tres fotos del jardín van de fondo, con zoom lento y una transición en caracteres ASCII entre una y otra.
+- Los botones tienen un reflejo que pasa, un barrido de caracteres y los íconos se dibujan solos.
+- Botones de Guardar contacto (vCard) y Compartir (menú nativo del teléfono).
+- Respeta la opción de reducir movimiento del sistema.
+
+## Estructura
+
+- `index.html`: contenido y metadatos (Open Graph y JSON-LD).
+- `style.css`: estilos.
+- `app.js`: animaciones del logo, del fondo y de los botones. Sin dependencias.
+- `assets/`: fotos WEBP, fuentes WOFF, logo SVG e imagen para compartir. Los JPG y TTF originales se guardan como respaldo y no se publican.
+- `vercel.json`: encabezados de seguridad y de caché.
+- `animaciones/`: animaciones del logo. No se publican con la página (ver `.vercelignore`).
 
 ## Ejecutar localmente
 
@@ -10,33 +27,23 @@ La entrada forma el logo, las fotos y los enlaces con una nube de caracteres ASC
 python3 -m http.server 3000
 ```
 
-## Desplegar en Vercel
+## Publicar en Vercel
 
-Publicada en https://la-palapa-links.vercel.app/ en el proyecto `la-palapa-links-v2` del equipo MH Astral Systems. Proyecto: `prj_RnGmMWukSPIQPi2QW1MeVx8lBlt7`. La dirección pública conserva `la-palapa-links.vercel.app`.
-
-Importar esta carpeta como proyecto **Other** sin comando de compilación. La raíz del proyecto contiene `index.html`. `vercel.json` dirige `/` explícitamente a ese archivo.
+Proyecto estático (tipo **Other**, sin comando de compilación):
 
 ```bash
 npx vercel --prod
 ```
 
-Si la URL cambia, actualizar la URL canónica, metadatos Open Graph, JSON-LD, `robots.txt` y `sitemap.xml`.
+La política de seguridad (CSP) de `vercel.json` incluye el hash del bloque JSON-LD de `index.html`. Si cambias ese bloque, calcula de nuevo el hash (SHA-256 en base64 del contenido exacto del `<script type='application/ld+json'>`) y actualízalo en `vercel.json`; si no, el navegador bloqueará ese bloque.
 
 ## Contacto y destinos
 
 - WhatsApp y celular: +52 55 5435 3649
 - Oficina: +52 55 5653 7842
-- Correo publicado: informes@jardinlapalapa.com
+- Correo: informes@jardinlapalapa.com
 - Instagram: https://www.instagram.com/jardinlapalapaeventos/
 - Facebook: https://www.facebook.com/jardinlapalapaeventos
 - Bodas.com.mx: https://www.bodas.com.mx/jardines-para-bodas/jardin-la-palapa--e43219
-- Video publicado: https://www.youtube.com/watch?v=xv-FUfaO6so
+- Video: https://www.youtube.com/watch?v=xv-FUfaO6so
 - Ubicación: Prol. Abasolo 302, Valle Escondido, Tepepan, Tlalpan, CDMX.
-
-Destinos tomados del sitio de la clienta el 3 de octubre de 2026. El correo aparece en su aviso de privacidad. El enlace de YouTube lleva al video enlazado por el sitio, ya que no se verificó un canal oficial.
-
-## Diseño y medios
-
-Símbolo de palapa reconstruido como SVG y texto real con Cormorant Garamond. No usa una fotografía del logo. Fotografías aportadas por el cliente, restauradas con IA y optimizadas para web. La tercera fotografía utiliza el panel izquierdo de la imagen original en collage. Los originales se mantienen como JPG junto a las versiones WEBP restauradas. Los anuncios quedan fuera de esta entrega.
-
-No se copian scripts, plugins ni enlaces ajenos del sitio WordPress existente.
