@@ -29,8 +29,8 @@ svg{display:block}
 .intro .slide{opacity:0!important}
 .shade{position:fixed;inset:0;z-index:1;pointer-events:none;
   background:
-    radial-gradient(120% 70% at 50% 18%,rgba(20,9,9,.30),rgba(20,9,9,.62) 60%,rgba(14,6,6,.86) 100%),
-    linear-gradient(180deg,rgba(20,8,8,.55),rgba(20,8,8,.35) 30%,rgba(16,7,7,.62) 70%,rgba(12,5,5,.9))}
+    radial-gradient(120% 70% at 50% 18%,rgba(20,9,9,.14),rgba(20,9,9,.44) 60%,rgba(14,6,6,.74) 100%),
+    linear-gradient(180deg,rgba(20,8,8,.46),rgba(20,8,8,.18) 30%,rgba(16,7,7,.42) 70%,rgba(12,5,5,.8))}
 #ascii{position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 
 /* ---------- Página ---------- */
@@ -48,9 +48,9 @@ svg{display:block}
     radial-gradient(circle at 70% 21%,rgba(255,246,222,.9) 0 1.5px,transparent 2.5px),
     radial-gradient(circle at 22% 22%,rgba(255,246,222,.9) 0 1.5px,transparent 2.5px),
     linear-gradient(180deg,rgba(222,182,98,.42),rgba(222,182,98,0) 46%),
-    radial-gradient(90% 90% at 50% 55%,#fffdf8,#f8f1e6 62%,#ecdfca);
+    radial-gradient(90% 90% at 50% 55%,#fffaf1,#f6ecdc 62%,#e8d5b7);
   box-shadow:inset 0 0 0 8px rgba(255,251,244,.0),inset 0 0 0 9px rgba(176,138,64,.42),inset 0 0 0 13px rgba(255,251,244,0),inset 0 0 0 14px rgba(176,138,64,.2),
-    0 22px 55px rgba(0,0,0,.55),0 0 0 1px rgba(232,200,130,.35),0 0 40px rgba(226,186,104,.18)}
+    0 20px 50px rgba(34,4,12,.5),0 0 0 1px rgba(232,200,130,.42),0 0 48px rgba(226,186,104,.26)}
 .logo-card::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.9;
   background:radial-gradient(circle at 20% 12%,rgba(255,240,200,.7) 0 2px,transparent 3px),radial-gradient(circle at 64% 7%,rgba(255,240,200,.7) 0 2px,transparent 3px),radial-gradient(circle at 86% 19%,rgba(255,240,200,.7) 0 1.5px,transparent 2.5px);
   animation:twinkle-bg 5s ease-in-out infinite}
@@ -69,9 +69,9 @@ svg{display:block}
 /* ---------- Botones ---------- */
 .btn{--a:220,186,110;position:relative;display:flex;align-items:center;gap:13px;min-height:66px;padding:11px 15px 11px 11px;
   border-radius:var(--radius);color:var(--ink);overflow:hidden;isolation:isolate;
-  background:linear-gradient(115deg,rgba(var(--a),.16),rgba(26,12,12,.62) 58%),rgba(24,11,11,.48);
-  border:1px solid rgba(var(--a),.4);
-  box-shadow:0 12px 30px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,238,205,.1);
+  background:linear-gradient(115deg,rgba(255,236,206,.14),rgba(84,18,32,.34) 52%,rgba(58,12,22,.48)),rgba(32,8,14,.24);
+  border:1px solid rgba(var(--a),.42);
+  box-shadow:0 12px 30px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,238,205,.16);
   -webkit-backdrop-filter:blur(8px) saturate(1.15);backdrop-filter:blur(8px) saturate(1.15);
   transition:transform .3s cubic-bezier(.3,1.4,.6,1),border-color .25s,box-shadow .25s;will-change:transform}
 .btn::before{content:'';position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .3s;
@@ -85,11 +85,11 @@ svg{display:block}
 .btn:hover::before,.btn:focus-visible::before{opacity:1}
 .btn:active{transform:scale(.975)!important}
 .ico{position:relative;z-index:1;flex:none;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;
-  color:rgb(var(--a));background:rgba(var(--a),.12);border:1px solid rgba(var(--a),.45);
+  color:rgb(var(--a));background:linear-gradient(150deg,rgba(255,244,224,.22),rgba(var(--a),.08) 70%);border:1px solid rgba(var(--a),.45);
   box-shadow:inset 0 0 14px rgba(var(--a),.14),0 0 16px rgba(var(--a),.16);transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .btn:hover .ico{transform:scale(1.08) rotate(-5deg)}
 .ico svg,.soc svg,.pill svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
-.txt{position:relative;z-index:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.txt{position:relative;z-index:1;display:flex;flex-direction:column;gap:3px;min-width:0;text-shadow:0 1px 10px rgba(20,4,8,.55)}
 .txt strong{font-size:15.5px;font-weight:700;letter-spacing:.1px;white-space:nowrap}
 .txt small{font-size:12px;color:var(--muted);line-height:1.3}
 .arrow{position:relative;z-index:1;margin-left:auto;flex:none;width:18px;height:18px;fill:none;stroke:rgb(var(--a));stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
@@ -121,12 +121,14 @@ svg{display:block}
 /* Redes */
 .social{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:2px}
 .soc,.pill{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:8px 10px;border-radius:14px;
-  font-size:13px;font-weight:600;color:var(--ink);background:rgba(24,11,11,.5);border:1px solid rgba(220,186,110,.32);
+  font-size:13px;font-weight:600;color:var(--ink);background:linear-gradient(150deg,rgba(255,236,206,.1),rgba(70,14,26,.34)),rgba(32,8,14,.22);border:1px solid rgba(220,186,110,.36);
+  text-shadow:0 1px 8px rgba(20,4,8,.55);
   -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:border-color .25s,background .25s,transform .25s;overflow:hidden}
 .soc svg,.pill svg{width:21px;height:21px;color:var(--gold)}
-.soc:hover,.pill:hover{border-color:rgba(220,186,110,.8);background:rgba(60,22,24,.55)}
+.soc:hover,.pill:hover{border-color:rgba(220,186,110,.8);background:rgba(96,22,36,.5)}
 .soc:active,.pill:active{transform:scale(.96)}
-.util .pill{min-height:52px}
+.util{display:grid}
+.util .pill{min-height:50px}
 
 /* Pie */
 .foot{margin-top:26px;text-align:center;font-size:12px;color:var(--soft);line-height:1.6;text-shadow:0 1px 10px rgba(0,0,0,.8)}
@@ -209,7 +211,7 @@ svg{display:block}
 @media (min-width:900px){
   .page{max-width:480px;padding-top:28px;padding-bottom:36px}
   .page::before{content:'';position:fixed;top:0;bottom:0;left:50%;width:520px;transform:translateX(-50%);z-index:-1;
-    background:linear-gradient(180deg,rgba(18,8,8,.5),rgba(18,8,8,.35) 40%,rgba(18,8,8,.55));
+    background:linear-gradient(180deg,rgba(18,8,8,.4),rgba(18,8,8,.24) 40%,rgba(18,8,8,.44));
     -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
     border-left:1px solid rgba(220,186,110,.16);border-right:1px solid rgba(220,186,110,.16)}
   .shade{background:
