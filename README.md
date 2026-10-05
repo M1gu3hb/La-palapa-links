@@ -19,7 +19,7 @@ En línea: https://la-palapa-links.vercel.app/
 - `app.js`: animaciones del logo, del fondo y de los botones. Sin dependencias.
 - `assets/`: fotos WEBP, fuentes WOFF, logo SVG e imagen para compartir. Los JPG y TTF originales se guardan como respaldo y no se publican.
 - `vercel.json`: encabezados de seguridad y de caché.
-- `animaciones/`: animaciones del logo. No se publican con la página (ver `.vercelignore`).
+- `animaciones/`: animaciones del logo, en `sin-sonido/` (GIF) y `con-sonido/` (MP4 con efectos de sonido). No se publican con la página (ver `.vercelignore`).
 
 ## Ejecutar localmente
 
