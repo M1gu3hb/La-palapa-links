@@ -9,6 +9,7 @@ En línea: https://la-palapa-links.vercel.app/
 - El logo se escribe solo con una pluma de oro (animación «Trazo de Oro»). Al tocarlo se vuelve a escribir. Los trazos salen de `assets/logo-palapa.svg` y el orden de escritura se calcula en el navegador.
 - Las tres fotos del jardín van de fondo, con zoom lento y un fundido suave entre una y otra.
 - Los botones tienen un reflejo que pasa, un barrido de caracteres y los íconos se dibujan solos.
+- Contacto en orden: Celular 55 5435 3649 (llamada y WhatsApp) y Teléfono de oficina 55 5653 7842 (llamada).
 - Botón de Compartir (menú nativo del teléfono).
 - Respeta la opción de reducir movimiento del sistema.
 
@@ -39,9 +40,8 @@ La política de seguridad (CSP) de `vercel.json` incluye el hash del bloque JSON
 
 ## Contacto y destinos
 
-- WhatsApp y celular: +52 55 5435 3649
-- Oficina: +52 55 5653 7842
-- Correo: informes@jardinlapalapa.com
+- Celular (llamadas y WhatsApp): +52 55 5435 3649
+- Teléfono de oficina (llamadas): +52 55 5653 7842
 - Instagram: https://www.instagram.com/jardinlapalapaeventos/
 - Facebook: https://www.facebook.com/jardinlapalapaeventos
 - Bodas.com.mx: https://www.bodas.com.mx/jardines-para-bodas/jardin-la-palapa--e43219
