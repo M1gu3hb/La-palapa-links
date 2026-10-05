@@ -7,7 +7,7 @@ En línea: https://la-palapa-links.vercel.app/
 ## Qué tiene
 
 - El logo se escribe solo con una pluma de oro (animación «Trazo de Oro»). Al tocarlo se vuelve a escribir. Los trazos salen de `assets/logo-palapa.svg` y el orden de escritura se calcula en el navegador.
-- Las tres fotos del jardín van de fondo, con zoom lento y una transición en caracteres ASCII entre una y otra.
+- Las tres fotos del jardín van de fondo, con zoom lento y un fundido suave entre una y otra.
 - Los botones tienen un reflejo que pasa, un barrido de caracteres y los íconos se dibujan solos.
 - Botón de Compartir (menú nativo del teléfono).
 - Respeta la opción de reducir movimiento del sistema.

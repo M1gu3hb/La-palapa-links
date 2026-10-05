@@ -1,19 +1,15 @@
 /* Jardín La Palapa · página de enlaces (link in bio)
-   Fondo con las fotos del jardín que se disuelven en caracteres ASCII, logo que se escribe a mano
-   con pluma de oro (animación «Trazo de Oro») y botones con reflejos e íconos dibujados. Sin dependencias. */
+   Fondo con las fotos del jardín en fundido suave, logo que se escribe a mano con pluma de oro
+   (animación «Trazo de Oro») y botones con reflejos e íconos dibujados. Sin dependencias. */
 (() => {
   'use strict';
   const root = document.documentElement;
-  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
-  const reduce = motionQuery.matches;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const TAU = Math.PI * 2;
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   const seg = (t, a, b) => clamp((t - a) / (b - a));
-  const smooth = t => t * t * (3 - 2 * t);
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
   const hash = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
-  const RAMP = ' .·:-=+*#%@';
   const BITS = '01<>/|[]{}$#%&?!*+=~^;:';
   const now = () => performance.now() / 1000;
 
@@ -71,142 +67,29 @@
     } catch (e) { if (e && e.name !== 'AbortError') say('Copia el enlace: ' + data.url); }
   });
 
-  // ---------------------------------------------------------------- fotos de fondo
+  // ---------------------------------------------------------------- fotos de fondo (fundido normal)
+  // La foto nueva aparece encima de la anterior; la anterior se queda debajo, sin cortar su movimiento,
+  // hasta que la nueva cubre todo. Así no hay saltos ni oscurecimiento a la mitad del cambio.
   const slides = [...document.querySelectorAll('.slide')];
   const capN = document.getElementById('cap-n'), capT = document.getElementById('cap-t');
-  let current = 0;
+  const FADE = 1800;
+  let current = 0, fadeTimer = 0;
   function showSlide(i) {
-    slides[current].classList.remove('on');
+    const prev = slides[current], next = slides[i];
+    if (prev === next) return;
+    clearTimeout(fadeTimer);
+    slides.forEach(s => { if (s !== prev && s !== next) s.classList.remove('on', 'out'); });
+    prev.classList.remove('on'); prev.classList.add('out');
+    next.classList.remove('out'); void next.offsetWidth; next.classList.add('on');
+    fadeTimer = setTimeout(() => prev.classList.remove('out'), FADE + 300);
     current = i;
-    // reinicia el Ken Burns
-    const s = slides[current]; s.classList.remove('on'); void s.offsetWidth; s.classList.add('on');
-    capN.textContent = String(current + 1).padStart(2, '0'); capT.textContent = s.dataset.label;
+    capN.textContent = String(i + 1).padStart(2, '0'); capT.textContent = next.dataset.label;
+  }
+  function nextSlide() {
+    const i = (current + 1) % slides.length, img = slides[i];
+    (img.decode ? img.decode() : Promise.resolve()).then(() => showSlide(i), () => {});
   }
   slides.slice(1).forEach(s => { s.loading = 'eager'; });
-
-  // ---------------------------------------------------------------- capa ASCII de fondo
-  const cv = document.getElementById('ascii');
-  const cx = cv.getContext('2d');
-  let W = 0, H = 0, dpr = 1, cw = 10, ch = 15, cols = 0, rows = 0;
-  const ripples = [];
-  const pointer = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4 };
-  let dissolve = null;          // transición foto -> ASCII -> foto
-  const sampler = document.createElement('canvas');
-  const sctx = sampler.getContext('2d', { willReadFrequently: true });
-  const PAL = ['#6e4a2a', '#8c6334', '#ab7f42', '#c99a55', '#dfb86f', '#f0d595', '#fbeec8'];
-
-  function resize() {
-    W = innerWidth; H = innerHeight; dpr = Math.min(devicePixelRatio || 1, 1.25);
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-    cw = Math.max(8, Math.min(13, Math.round(Math.min(W, H) / 42))); ch = Math.round(cw * 1.55);
-    cols = Math.ceil(W / cw); rows = Math.ceil(H / ch);
-    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cx.font = `600 ${Math.round(ch * .8)}px ui-monospace, Menlo, Consolas, monospace`;
-    cx.textBaseline = 'top';
-    if (dissolve) dissolve.grids = dissolve.imgs.map(sample);
-    logo.resize();
-  }
-  // muestrea una foto (con encuadre cover) en la cuadrícula de caracteres
-  function sample(img) {
-    if (!img || !img.naturalWidth) return null;
-    sampler.width = cols; sampler.height = rows;
-    const sc = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-    const sw = W / sc, sh = H / sc;
-    sctx.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, 0, 0, cols, rows);
-    const d = sctx.getImageData(0, 0, cols, rows).data;
-    const lum = new Float32Array(cols * rows);
-    for (let i = 0; i < cols * rows; i++) lum[i] = (d[i * 4] * .2126 + d[i * 4 + 1] * .7152 + d[i * 4 + 2] * .0722) / 255;
-    return lum;
-  }
-  function field(x, y, t) {
-    const nx = x / cols, ny = y / rows, a = cols / rows;
-    let v = Math.sin(nx * 8 * a + t * .5 + Math.sin(ny * 6 + t * .35) * 1.6);
-    v += Math.sin(ny * 10 - t * .6 + Math.sin(nx * 5 * a - t * .3) * 2);
-    v += Math.sin((nx * a + ny) * 6 + t * .3);
-    return v / 3 * .5 + .5;
-  }
-  // zona central donde viven los botones: ahí el ASCII es más tenue
-  function quiet(x) {
-    if (W < 900) return .9;
-    const d = Math.abs(x * cw + cw / 2 - W / 2) / 280;
-    return clamp(.25 + smooth(clamp(d - .75)) * .75, .25, 1);
-  }
-  let t0 = now(), lastDraw = 0, running = true, introState = null;
-  function drawAscii(time) {
-    const t = time - t0;
-    cx.clearRect(0, 0, W, H);
-    pointer.x += (pointer.tx - pointer.x) * .25; pointer.y += (pointer.ty - pointer.y) * .25;
-    for (let i = ripples.length - 1; i >= 0; i--) if (t - ripples[i].t > 2.2) ripples.splice(i, 1);
-    const buckets = PAL.map(() => []);
-    const tick = Math.floor(t * 16);
-    const ambient = W >= 900;
-    const mcx = pointer.x / cw, mcy = pointer.y / ch, asp = ch / cw;
-    // estado de disolución de foto
-    let dA = 0, gridA = null, gridB = null, mix = 0, gather = 1;
-    if (dissolve) {
-      const k = (time - dissolve.start) / dissolve.dur;
-      if (k >= 1) { dissolve.done && dissolve.done(); dissolve = null; }
-      else {
-        dA = dissolve.intro ? (1 - smooth(seg(k, .55, 1))) : smooth(seg(k, 0, .34)) * (1 - smooth(seg(k, .5, 1)));
-        gather = dissolve.intro ? easeOut(seg(k, 0, .5)) : 1;
-        [gridA, gridB] = dissolve.grids; mix = dissolve.intro ? 1 : smooth(seg(k, .32, .55));
-        if (!dissolve.swapped && k >= (dissolve.intro ? .42 : .4)) { dissolve.swapped = true; dissolve.swap && dissolve.swap(); }
-      }
-    }
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        const h = hash(x, y);
-        let lvl = -1, c = '';
-        // 1) foto en ASCII durante la transición
-        if (dA > .01) {
-          const i = y * cols + x;
-          const la = gridA ? gridA[i] : 0, lb = gridB ? gridB[i] : 0;
-          const L = la * (1 - mix) + lb * mix;
-          const v = clamp((L - .05) * 1.15);
-          if (v > .06 && h < dA * 1.25) {
-            const scr = h > dA || (dissolve && dissolve.intro && hash(y, x) > gather);
-            c = scr ? BITS[(tick + ((h * 97) | 0)) % BITS.length] : RAMP[Math.min(RAMP.length - 1, 1 + ((v * (RAMP.length - 1)) | 0))];
-            lvl = Math.min(PAL.length - 1, (v * PAL.length) | 0);
-            if (dissolve && dissolve.intro && gather < 1) {
-              const off = (1 - gather) * (30 + h * 90), ang = hash(y + 7, x) * TAU;
-              buckets[lvl].push(c, x * cw + Math.cos(ang) * off, y * ch + Math.sin(ang) * off);
-              continue;
-            }
-          }
-        }
-        // 2) campo ambiental (solo escritorio) + puntero + toques
-        if (lvl < 0) {
-          if (!ambient && !ripples.length) continue;
-          let v = ambient ? Math.pow(Math.max(0, field(x, y, t) - .48) / .52, 1.5) * .5 * quiet(x) : 0;
-          if (pointer.x > -1e3) { const md = Math.hypot(x - mcx, (y - mcy) * asp); v += Math.exp(-md * md / 40) * .7; }
-          for (let r = 0; r < ripples.length; r++) {
-            const rp = ripples[r], age = t - rp.t, d = Math.hypot(x - rp.x, (y - rp.y) * asp) - age * 30;
-            v += Math.exp(-d * d / 6) * (1 - age / 2.2) * .9;
-          }
-          if (v < .1 || h > .86) continue;
-          const k = Math.min(1, v);
-          c = (k > .6 && hash(x, y + tick) > .7) ? BITS[(tick + x + y) % BITS.length] : RAMP[Math.min(RAMP.length - 1, 1 + ((k * (RAMP.length - 2)) | 0))];
-          lvl = Math.min(PAL.length - 1, (k * (PAL.length - 1)) | 0);
-        }
-        buckets[lvl].push(c, x * cw, y * ch);
-      }
-    }
-    for (let b = 0; b < buckets.length; b++) {
-      const a = buckets[b]; if (!a.length) continue;
-      cx.fillStyle = PAL[b];
-      for (let i = 0; i < a.length; i += 3) cx.fillText(a[i], a[i + 1], a[i + 2]);
-    }
-  }
-  function startDissolve(nextIndex, intro = false) {
-    const from = intro ? null : slides[current], to = slides[nextIndex];
-    const go = () => {
-      dissolve = {
-        start: now(), dur: intro ? 1.7 : 2.1, intro, imgs: [from, to], grids: [from ? sample(from) : null, sample(to)], swapped: false,
-        swap: () => { if (intro) root.classList.remove('intro'); else showSlide(nextIndex); },
-      };
-    };
-    if (to.complete && to.naturalWidth) go(); else to.decode().then(go, () => { if (!intro) showSlide(nextIndex); else root.classList.remove('intro'); });
-  }
 
   // ---------------------------------------------------------------- esqueleto de trazo
   // Esqueleto de trazo en el navegador: rasteriza cada pieza del logo, calcula su eje (Zhang-Suen),
@@ -373,7 +256,8 @@
       const sx = shadow[1]; sx.setTransform(1, 0, 0, 1, 0, 0); sx.clearRect(0, 0, px, px);
       sx.filter = `blur(${(4.5 * ldpr).toFixed(1)}px)`; sx.globalAlpha = .55; sx.drawImage(red[0], 3.5 * ldpr, 5 * ldpr); sx.filter = 'none'; sx.globalAlpha = 1;
       sx.globalCompositeOperation = 'source-in'; sx.fillStyle = 'rgb(84,28,30)'; sx.fillRect(0, 0, px, px); sx.globalCompositeOperation = 'source-over';
-      dirty = written;   // antes de la primera escritura la tarjeta queda vacía
+      // se repinta en el acto para que el logo nunca se vea vacío; antes de la primera escritura queda en blanco
+      if (written && !play) staticFrame(); else dirty = written;
     }
     const toCss = (x, y) => [ox + x * s, oy + y * s];
     function mask(m, prog) {
@@ -511,6 +395,18 @@
     return { load, resize, draw, write, staticFrame: () => { written = true; staticFrame(); }, get playing() { return !!play || (idleAt && now() > idleAt); }, get loaded() { return loaded; } };
   })();
 
+  // ---------------------------------------------------------------- tamaño
+  // En el celular la barra del navegador cambia el alto de la ventana al hacer scroll. Eso no debe
+  // redibujar nada: el logo solo se recalcula si cambia su tamaño real o la densidad de la pantalla.
+  const logoCard = document.getElementById('logo-card');
+  let lastSize = 0, lastDpr = 0, resizeTimer = 0;
+  function fit(force) {
+    const w = logoCard.clientWidth, d = devicePixelRatio || 1;
+    if (!force && w === lastSize && d === lastDpr) return;
+    lastSize = w; lastDpr = d; logo.resize();
+  }
+  addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fit, 150); });
+
   // ---------------------------------------------------------------- entrada y loop
   const reveals = [...document.querySelectorAll('.rv')];
   function revealAll(stagger) {
@@ -523,11 +419,11 @@
       stagger ? setTimeout(go, i * 70) : go();
     });
   }
+  let introDone = false;
   function finishIntro() {
-    if (!introState || introState.done) return;
-    introState.done = true;
+    if (introDone) return;
+    introDone = true;
     root.classList.remove('intro');
-    if (dissolve && dissolve.intro) dissolve = null;
     revealAll(false);
     root.classList.add('go');
     ['pointerdown', 'keydown', 'wheel', 'touchmove'].forEach(ev => removeEventListener(ev, finishIntro));
@@ -536,42 +432,32 @@
   if (reduce) {
     root.classList.add('static');
     reveals.forEach(el => el.classList.add('in'));
-    cv.remove();
-    logo.load().then(() => { logo.resize(); logo.staticFrame(); addEventListener('resize', () => { logo.resize(); logo.staticFrame(); }); });
+    logo.load().then(() => { fit(true); logo.staticFrame(); });
     return;
   }
 
-  resize();
-  addEventListener('resize', () => { clearTimeout(resize.t); resize.t = setTimeout(resize, 120); });
-  addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { pointer.tx = e.clientX; pointer.ty = e.clientY; } }, { passive: true });
-  document.addEventListener('pointerleave', () => { pointer.tx = pointer.ty = -1e4; });
-  addEventListener('pointerdown', e => { ripples.push({ x: e.clientX / cw, y: e.clientY / ch, t: now() - t0 }); }, { passive: true });
-
-  let asciiClear = false;
+  // el canvas solo dibuja el logo (escritura y destellos); el resto son animaciones de CSS
+  let running = !document.hidden, started = false, rafId = 0;
   function loop() {
+    rafId = 0;
     if (!running) return;
-    requestAnimationFrame(loop);
-    const time = now();
-    if (logo.playing) logo.draw(time);                 // el logo va a la tasa del dispositivo
-    const needAscii = dissolve || ripples.length || W >= 900;
-    if (time - lastDraw < 1 / 30) return;             // el fondo ASCII, máx. 30 fps
-    lastDraw = time;
-    if (!logo.playing) logo.draw(time);
-    if (needAscii) { drawAscii(time); asciiClear = false; }
-    else if (!asciiClear) { cx.clearRect(0, 0, W, H); asciiClear = true; }
+    rafId = requestAnimationFrame(loop);
+    logo.draw(now());
   }
-  document.addEventListener('visibilitychange', () => {
-    running = !document.hidden;
-    if (running) { requestAnimationFrame(loop); schedule(); } else clearTimeout(slideTimer);
-  });
+  const startLoop = () => { if (!rafId) rafId = requestAnimationFrame(loop); };
   let slideTimer = 0;
   function schedule() {
     clearTimeout(slideTimer);
-    slideTimer = setTimeout(() => { if (!document.hidden) startDissolve((current + 1) % slides.length); schedule(); }, 9000);
+    slideTimer = setTimeout(() => { if (!document.hidden) nextSlide(); schedule(); }, 9000);
   }
+  document.addEventListener('visibilitychange', () => {
+    const was = running;
+    running = !document.hidden;
+    if (!running) { clearTimeout(slideTimer); return; }
+    if (!was && started) { startLoop(); schedule(); }
+  });
 
-  // Intro: la foto se arma desde caracteres, el logo se escribe con pluma de oro y llegan los botones.
-  introState = { done: false };
+  // Intro: la primera foto aparece con un fundido, el logo se escribe con pluma de oro y llegan los botones.
   root.classList.add('intro');
   const ready = Promise.race([Promise.all([
     document.fonts ? document.fonts.ready : 0,
@@ -579,20 +465,19 @@
   ]), new Promise(r => setTimeout(r, 1400))]);
   const logoReady = logo.load().then(() => true, () => false);
   ready.then(() => {
-    resize();
-    startDissolve(0, true);
-    document.getElementById('logo-card').classList.add('in');
+    started = true;
+    root.classList.remove('intro');
+    logoCard.classList.add('in');
     setTimeout(() => revealAll(true), 650);
-    setTimeout(() => { if (!introState.done) { introState.done = true; root.classList.add('go'); } }, 2600);
-    requestAnimationFrame(loop);
+    setTimeout(() => { if (!introDone) { introDone = true; root.classList.add('go'); } }, 2600);
+    if (running) startLoop();
     schedule();
   });
   // el logo se escribe en cuanto su trazo está listo (no detiene la entrada de la página)
   Promise.all([ready, logoReady]).then(([, ok]) => {
-    if (ok) { logo.resize(); setTimeout(() => logo.write(), 380); return; }
+    if (ok) { fit(true); setTimeout(() => logo.write(), 380); return; }
     const img = new Image(); img.className = 'logo-img'; img.alt = 'Jardín La Palapa · Quality & Service'; img.src = './assets/logo-palapa.svg';
-    document.getElementById('logo-card').append(img);
+    logoCard.append(img);
   });
   ['pointerdown', 'keydown', 'wheel', 'touchmove'].forEach(ev => addEventListener(ev, finishIntro, { once: true, passive: true }));
-  setTimeout(() => { if (root.classList.contains('intro')) finishIntro(); }, 5000);
 })();
